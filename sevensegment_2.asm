@@ -104,116 +104,80 @@ write_sevensegment_continue:
     
     bcf PORTB,0
     return
-    
-write_0:
-    movlw NUMBER_0
-    movwf parameter
-    call write_sevensegment
-    return
-    
-write_1:
-    movlw NUMBER_1
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_2:
-    movlw NUMBER_2
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_3:
-    movlw NUMBER_3
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_4:
-    movlw NUMBER_4
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_5:
-    movlw NUMBER_5
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_6:
-    movlw NUMBER_6
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_7:
-    movlw NUMBER_7
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_8:
-    movlw NUMBER_8
-    movwf parameter
-    call write_sevensegment
-    return
-
-write_9:    
-    movlw NUMBER_9
-    movwf parameter
-    call write_sevensegment
-    return   
-    
+     
 update_led:
-    btfsc STATUS,Z
-    goto write_0
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_0
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_1
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_1
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_2
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_2
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_3
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_3
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_4
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_4
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_5
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_5
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_6
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_6
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_7
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_7
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_8
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_8
+    goto write_led_end
     
     decf position_tmp,W
     movwf position_tmp
-    btfsc STATUS,Z
-    goto write_9
+    btfss STATUS,Z
+    goto $+3
+    movlw NUMBER_9
+    goto write_led_end
     
+write_led_end:
+    movwf parameter
+    call write_sevensegment
+    return
 
 increment_led_value3:
     ; Reset segment_tmp
