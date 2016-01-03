@@ -23,7 +23,8 @@
 ; RB1 is shift register commit
 ; RB2 is data clock shift register 1
 ; RB3 is data clock shift register 2
- 
+; RB4 is data clock shift register 3
+
     cblock 0x20
         w_temp			;0x20
         status_temp		;0x21
@@ -303,7 +304,7 @@ main:
 interrupt_handler:
     movwf   w_temp      ; Save w register
     swapf   STATUS,w    ; STATUS -> w
-    bcf     STATUS,RP0   ; Switch to bank0
+    bcf     STATUS,RP0  ; Switch to bank0
     movwf   status_temp ; w -> status_temp
     
     ; Handle TMR1 Interrupt
@@ -319,20 +320,24 @@ interrupt_handler:
     retfie
 
 tmr1_int:
+    ; Increment LED value
     call increment_led_value1
     
+    ; Update led1 to new value
     movlw b'00000001'
     movwf current_led
     movfw led1_value
     movwf position_tmp
     call update_led
     
+    ; Update led2 to new value
     movlw b'00000010'
     movwf current_led
     movfw led2_value
     movwf position_tmp
     call update_led
     
+    ; Update led to new value
     movlw b'00000100'
     movwf current_led
     movfw led3_value
