@@ -108,61 +108,61 @@ write_0:
     movlw NUMBER_0
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
     
 write_1:
     movlw NUMBER_1
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_2:
     movlw NUMBER_2
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_3:
     movlw NUMBER_3
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_4:
     movlw NUMBER_4
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_5:
     movlw NUMBER_5
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_6:
     movlw NUMBER_6
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_7:
     movlw NUMBER_7
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_8:
     movlw NUMBER_8
     movwf parameter
     call write_sevensegment
-    goto update_led_end
+    return
 
 write_9:    
     movlw NUMBER_9
     movwf parameter
     call write_sevensegment
-    goto update_led_end   
+    return   
     
 update_led:
     btfsc STATUS,Z
@@ -213,8 +213,6 @@ update_led:
     btfsc STATUS,Z
     goto write_9
     
-update_led_end:
-    return
 
 increment_led_value3:
     ; Reset segment_tmp
