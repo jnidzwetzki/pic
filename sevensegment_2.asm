@@ -303,7 +303,7 @@ tmr1_int:
     movwf update_led_parameter
     call update_led
     
-    ; Update led to new value
+    ; Update led3 to new value
     movlw b'00000100'
     movwf current_led
     movfw led3_value
