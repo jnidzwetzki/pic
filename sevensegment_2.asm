@@ -26,18 +26,18 @@
 ; RB4 is data clock shift register 3
 
     cblock 0x20
-        w_temp			;0x20
-        status_temp		;0x21
+        w_temp			    ;0x20
+        status_temp		    ;0x21
 	
-	led1_value		;0x22
-	led2_value		;0x23
-	led3_value		;0x24
+	led1_value		    ;0x22
+	led2_value		    ;0x23
+	led3_value		    ;0x24
 	
-	parameter		;0x25
-	segment_tmp             ;0x26
-	position_tmp		;0x27
-	current_led             ;0x28
-	led_value_tmp           ;0x29
+	write_sevensegment_parameter ;0x25
+	segment_tmp		    ;0x26
+	update_led_parameter	    ;0x27
+	current_led		    ;0x28
+	led_value_tmp		    ;0x29
     endc
   
     org 0x000 
@@ -54,7 +54,7 @@ write_sevensegment:
     
 write_sevensegment_start:
     bcf PORTB,0
-    rlf parameter,F
+    rlf write_sevensegment_parameter,F
     btfsc STATUS,C
     bsf PORTB,0
     
@@ -106,76 +106,78 @@ write_sevensegment_continue:
     return
      
 update_led:
+    movfw update_led_parameter
+    xorlw d'0'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_0
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'1'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_1
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'2'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_2
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'3'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_3
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'4'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_4
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'5'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_5
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'6'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_6
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'7'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_7
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'8'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_8
     goto write_led_end
     
-    decf position_tmp,W
-    movwf position_tmp
+    movfw update_led_parameter
+    xorlw d'9'
     btfss STATUS,Z
     goto $+3
     movlw NUMBER_9
     goto write_led_end
     
 write_led_end:
-    movwf parameter
+    movwf write_sevensegment_parameter
     call write_sevensegment
     return
 
@@ -291,21 +293,21 @@ tmr1_int:
     movlw b'00000001'
     movwf current_led
     movfw led1_value
-    movwf position_tmp
+    movwf update_led_parameter
     call update_led
     
     ; Update led2 to new value
     movlw b'00000010'
     movwf current_led
     movfw led2_value
-    movwf position_tmp
+    movwf update_led_parameter
     call update_led
     
     ; Update led to new value
     movlw b'00000100'
     movwf current_led
     movfw led3_value
-    movwf position_tmp
+    movwf update_led_parameter
     call update_led
     
     bcf PIR1,TMR1IF
