@@ -32,7 +32,7 @@
 	led1_value		;0x22
 	led2_value		;0x23
 	led3_value		;0x24
-	´
+	
 	parameter		;0x25
 	segment_tmp             ;0x26
 	position_tmp		;0x27
