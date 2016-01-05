@@ -41,6 +41,8 @@
 	tmr1_h_tmp		    ;0x2A
 	tmr1_l_tmp		    ;0x2B
 	tmr1_decr_tmp               ;0x2C
+	
+	tmr0_int_ignore             ;0x2D
     endc
   
     org 0x000 
@@ -275,6 +277,10 @@ prepare:
     movlw b'00100001'  ; Prescale 4, internal clock, timer active
     movwf T1CON 
     
+    ; Handle TMR0 interrupt again
+    movlw d'0'
+    movwf tmr0_int_ignore
+    
     ; Enable interrupts
     banksel INTCON
     bsf	INTCON,T0IE
@@ -300,12 +306,16 @@ prepare_ccp:
     bcf CCP1CON,1
     bsf CCP1CON,0
     
-    ; Disable Timer1 Interrupts and Stop Timer
-    banksel PIR1
-    bcf PIR1,CCP1IF
-    bcf	INTCON,T0IE
-    banksel OPTION_REG
-    bsf OPTION_REG,5
+    ; Ignore TMR0 interrupts 25 times
+    ; This ensures, that no new sonic measurements are prepared during
+    ; the next moments.
+    ; 
+    ; In normal operation, the interrupts will made available 
+    ; at the end of the mesasurement cycle. When the sensor
+    ; does not capture a result, the timer deceases to '0'
+    ; and the next TMR0 interrupt will trigger a new mesasurement cycle.
+    movlw d'25'
+    movwf tmr0_int_ignore
 
     return
     
@@ -372,11 +382,9 @@ ccp_int_received_low_end:
     btfss STATUS,Z
     goto increment_low_tmr
     
-    ; Enable tmr0 interrupts and start timer
-    banksel PIR1
-    bsf	INTCON,T0IE
-    banksel OPTION_REG
-    bcf OPTION_REG,5
+    ; Enable TMR0 interrupts
+    movlw d'0'
+    movwf tmr0_int_ignore
     
     return
     
@@ -424,18 +432,28 @@ interrupt_handler:
     retfie
 
 ccp1_int:
+    banksel PIR1
+    bcf PIR1,CCP1IF
+    
     btfss CCP1CON,0
     call ccp_int_received
     
     btfsc CCP1CON,0
     call ccp_int_waiting
     
-    banksel PIR1
-    bcf PIR1,CCP1IF
-    
     return
     
 tmr0_int:
+    banksel INTCON
+    bcf INTCON,TMR0IF
+    
+    ; We are inside a measurement cycle
+    ; Skip LED update and preparement of
+    ; new measurement cycles
+    movfw tmr0_int_ignore
+    btfss STATUS,Z
+    return
+    
     ; Update led1 to new value
     movlw b'00000001'
     movwf current_led
@@ -463,7 +481,6 @@ tmr0_int:
     ; Prepare ccp module to capture rising edge of the echo port
     call prepare_ccp
     
-    bcf INTCON,TMR0IF
     return
     
 ;--------End of All Code Sections ---------------------------------------------
