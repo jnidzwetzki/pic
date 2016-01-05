@@ -330,11 +330,11 @@ increment_low_tmr:
     
 ccp_int_received:
     
-    ; Store a copy of tmr1
-    movfw TMR1L
+    ; Store a copy of tmr1 value at CCP capture.
+    movfw CCPR1L
     movwf tmr1_l_tmp
     
-    movfw TMR1H
+    movfw CCPR1H
     movwf tmr1_h_tmp
     
     call reset_led_counters
