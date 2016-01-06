@@ -111,9 +111,7 @@ write_sevensegment_continue:
     return
 
 increment_led_value3:
-    ; Reset segment_tmp
-    movlw b'00000000'
-    movwf led2_value
+    clrf led2_value
     
     ; Handle overflow
     incf led3_value,F
@@ -127,8 +125,7 @@ increment_led_value3:
     
 increment_led_value2:
     
-    movlw b'00000000'
-    movwf led1_value
+    clrf led1_value
 
     incf led2_value,F
     movfw led2_value
@@ -237,16 +234,15 @@ write_led_end:
     return
 
 reset_led_counters:
-    movlw b'00000000'  
-    movwf led1_value
-    movwf led2_value
-    movwf led3_value
+    clrf led1_value
+    clrf led2_value
+    clrf led3_value
     return
     
 prepare:
-    movlw b'00000000'  
-    movwf PORTB        ; Reset all pins on PORTB
-    movwf PORTA        ; Reset all pins on PORTA
+    clrf PORTB        ; Reset all pins on PORTB
+    clrf PORTA        ; Reset all pins on PORTA
+    
     call reset_led_counters
     
     banksel TRISB
@@ -257,8 +253,7 @@ prepare:
     bcf TRISA,0       ; RA0 is output
     
     banksel TMR0      ; Prepare Timer0
-    movlw b'00000000'
-    movwf TMR0
+    clrf TMR0
     bcf INTCON,T0IF
     
     ; Prescaler
@@ -326,9 +321,8 @@ ccp_int_waiting:
 
     ; Reset TMR1 counter
     banksel T1CON      ; Prepare Timer1
-    movlw b'00000000'
-    movwf TMR1L
-    movwf TMR1H 
+    clrf TMR1L
+    clrf TMR1H 
     
     return
 
