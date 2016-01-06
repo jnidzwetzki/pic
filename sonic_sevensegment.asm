@@ -98,7 +98,7 @@ write_sevensegment_led3:
     goto write_sevensegment_continue
     
 write_sevensegment_continue:  
-    decfsz segment_tmp, F
+    decfsz segment_tmp, f
     goto write_sevensegment_start
     
     bsf PORTB,1
@@ -355,8 +355,8 @@ ccp_int_received:
     ; speed of sound 330 m/s
     ; 2/330 = 0,0060 seconds
     ; 250.000 Timer values per sec
-    ; 1515 value
-    ; 100 * 15 = 15
+    ; TMR0 will capture a value of 1515
+    ; 100 * 15 = 1500 (we need to devide the result by 15)
     
 
 ccp_int_received_decrement_low:
@@ -447,12 +447,15 @@ tmr0_int:
     banksel INTCON
     bcf INTCON,TMR0IF
     
-    ; We are inside a measurement cycle
-    ; Skip LED update and preparement of
-    ; new measurement cycles
+    ; Decrease tmr0_int_ignore if > 0
+    ; if > 0 = We are inside a measurement cycle
+    ; Skip LED update and preparement of a
+    ; new measurement cycle
     movfw tmr0_int_ignore
-    btfss STATUS,Z
-    return
+    btfsc STATUS,Z
+    goto $+3
+    decf tmr0_int_ignore, f ; $+1
+    return                  ; $+2
     
     ; Update led1 to new value
     movlw b'00000001'
