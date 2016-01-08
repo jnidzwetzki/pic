@@ -18,6 +18,7 @@
 #define NUMBER_7 b'00110100'
 #define NUMBER_8 b'11110111'
 #define NUMBER_9 b'11110110'
+#define NUMBER_ERR b'11110000'
 
 ; RB0 is data
 ; RB1 is shift register commit
@@ -100,33 +101,33 @@ write_sevensegment_led3:
 write_sevensegment_continue:  
     decfsz segment_tmp, f
     goto write_sevensegment_start
-    
+    bcf PORTB,0
+
+    ; Make the changes in the shift register visible
     bsf PORTB,1
     nop
     nop
     nop
     bcf PORTB,1
     
-    bcf PORTB,0
     return
 
 increment_led_value3:
     clrf led2_value
-    
-    ; Handle overflow
     incf led3_value,F
     movfw led3_value
+    
     movwf led_value_tmp
     movlw d'10'
     subwf led_value_tmp,W
+    
+    ; Handle overflow
     btfsc STATUS,Z
     call reset_led_counters
     return
     
 increment_led_value2:
-    
     clrf led1_value
-
     incf led2_value,F
     movfw led2_value
     
@@ -137,11 +138,9 @@ increment_led_value2:
     ; Handle overflow
     btfsc STATUS,Z
     call increment_led_value3
-    
     return  
     
 increment_led_value1:
-    
     incf led1_value,F
     movfw led1_value
     
@@ -152,7 +151,6 @@ increment_led_value1:
     ; Handle overflow
     btfsc STATUS,Z
     call increment_led_value2
-    
     return
     
 update_led:
@@ -226,7 +224,8 @@ update_led:
     movlw NUMBER_9
     goto write_led_end
     
-    movlw NUMBER_9 ; TODO FIXME
+    ; Not a known number
+    movlw NUMBER_ERR 
     
 write_led_end:
     movwf write_sevensegment_parameter
