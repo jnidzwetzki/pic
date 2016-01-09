@@ -111,8 +111,8 @@ write_sevensegment_continue:
     nop
     nop
     bcf PORTB,1
-    
     return
+    
 ; *** Increment the number of led3 ***
 increment_led_value3:
     clrf led2_value
