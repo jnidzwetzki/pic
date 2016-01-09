@@ -53,7 +53,9 @@
     org 0x004
     goto interrupt_handler
     
-
+; *** Write a number to a shift register ***
+; 1. Parameter: current_led - Select the shiftregister
+; 2. Parameter: write_sevensegment_parameter - The value
 write_sevensegment:
     movlw 8
     movwf segment_tmp
@@ -111,7 +113,7 @@ write_sevensegment_continue:
     bcf PORTB,1
     
     return
-
+; *** Increment the number of led3 ***
 increment_led_value3:
     clrf led2_value
     incf led3_value,F
@@ -125,7 +127,8 @@ increment_led_value3:
     btfsc STATUS,Z
     call reset_led_counters
     return
-    
+
+; *** Increment the number of led2 ***
 increment_led_value2:
     clrf led1_value
     incf led2_value,F
@@ -139,7 +142,8 @@ increment_led_value2:
     btfsc STATUS,Z
     call increment_led_value3
     return  
-    
+
+; *** Increment the number of led1 *** 
 increment_led_value1:
     incf led1_value,F
     movfw led1_value
@@ -152,7 +156,10 @@ increment_led_value1:
     btfsc STATUS,Z
     call increment_led_value2
     return
-    
+
+; *** Update the value of one led ***
+; 1. Parameter update_led_parameter - the new value 
+; 2. Parameter: current_led - Select the shiftregister
 update_led:
     movfw update_led_parameter
     xorlw d'0'
@@ -232,12 +239,14 @@ write_led_end:
     call write_sevensegment
     return
 
+; *** Set all led counters to 0 ***
 reset_led_counters:
     clrf led1_value
     clrf led2_value
     clrf led3_value
     return
-    
+
+; *** Prepare the application ***
 prepare:
     clrf PORTB        ; Reset all pins on PORTB
     clrf PORTA        ; Reset all pins on PORTA
@@ -289,10 +298,11 @@ prepare:
 
     goto main
     
-    
+; *** Main - Loop forever ***    
 main:
     goto main    
-    
+ 
+; *** Prepare the CCP module ***
 prepare_ccp:
     banksel CCP1CON    ; Prepare CCP
     bcf CCP1CON,3
@@ -330,7 +340,8 @@ increment_low_tmr:
     movwf tmr1_l_tmp
     decf tmr1_h_tmp,f
     goto ccp_int_received_decrement_low
-    
+
+; *** Convert and display the ultrasoic measurement ***
 ccp_int_received:
     
     ; Store a copy of tmr1 value at CCP capture.
@@ -380,7 +391,8 @@ ccp_int_received_low_end:
     movwf tmr0_int_ignore
     
     return
-    
+
+; *** Start a new ultrasonic measurement ***
 send_sonic:
     bsf PORTA,0
     ; >= 10 nops to set PORTA,0 for 10 micro seconds to high
@@ -399,6 +411,7 @@ send_sonic:
     bcf PORTA,0
     return
 
+; *** The interrupt handler *** 
 interrupt_handler:
     movwf   w_temp      ; Save w register
     swapf   STATUS,w    ; STATUS -> w
@@ -424,6 +437,7 @@ interrupt_handler:
     swapf   w_temp,w
     retfie
 
+; *** Handle CCP interrupts *** 
 ccp1_int:
     banksel PIR1
     bcf PIR1,CCP1IF
@@ -436,6 +450,7 @@ ccp1_int:
     
     return
     
+; *** Handle TMR0 interrupts ***   
 tmr0_int:
     banksel INTCON
     bcf INTCON,TMR0IF
